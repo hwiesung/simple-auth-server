@@ -1,20 +1,25 @@
 const jwt = require('jsonwebtoken')
 var config = require('config');
+const constants = require('../constants');
+const db = require('../database').db;
+const Auth = require('../database').Auth;
 
 exports.register = async (req, res) => {
-
-
-    let user = {
-        _id:'abc',
-        username: 'hwiesung'
-    };
+    const userId = req.body.USER_ID;
+    const serviceType = req.body.SERVICE_TYPE;
+    if(!userId || !serviceType ) {
+        return res.status(403).json({
+            RET_CODE: constants.RET_CODE.INVALID_PARAMETER,
+            MSG: 'invalid input parameter'
+        })
+    }
 
     try{
         let token = await new Promise( (resolve, reject)=>{
             jwt.sign(
                 {
-                    _id: user._id,
-                    username: user.username
+                    SERVICE_TYPE: serviceType,
+                    USER_ID: userId
                 },
                 req.app.get('jwt-secret'),
                 {
@@ -26,11 +31,12 @@ exports.register = async (req, res) => {
                     resolve(token)
                 })
         });
+
         let refreshToken = await new Promise( (resolve, reject)=>{
             jwt.sign(
                 {
-                    _id: user._id,
-                    username: user.username
+                    SERVICE_TYPE: serviceType,
+                    USER_ID: userId
                 },
                 req.app.get('jwt-refresh-secret'),
                 {
@@ -42,14 +48,34 @@ exports.register = async (req, res) => {
                     resolve(token)
                 })
         });
+
+        await db.sequelize.transaction((t)=>{
+            return Auth.findOne(
+                {
+                    where: {USER_ID: userId, SERVICE_TYPE:serviceType},
+                    limit: 1,
+                    lock: true,
+                    transaction: t
+                }
+            ).then((auth)=>{
+                if(auth){
+                    return Auth.update({REFRESH_TOKEN:refreshToken,EDIT_YMDT:new Date()
+                    }, {where: {USER_ID: userId, SERVICE_TYPE:serviceType},transaction:t})
+                }
+                return Auth.create({SERVICE_TYPE:serviceType, USER_ID:userId, REFRESH_TOKEN:refreshToken},{transaction:t});
+            })
+        });
+
         res.json({
-            msg:'this router is working',
+            RET_CODE: constants.RET_CODE.SUCCESS,
             token,
             refreshToken
         });
     } catch(err){
+        console.log(err);
         res.status(403).json({
-            message: 'fail to generate token'
+            RET_CODE:constants.RET_CODE.FAIL_TO_TOKEN_GENERATE,
+            MSG: 'fail to generate token'
         })
     }
 }
@@ -92,4 +118,9 @@ exports.check = async (req, res) => {
             message: 'fail to verify token'
         })
     }
-}
+};
+
+exports.refresh = async (req, res) => {
+
+
+};

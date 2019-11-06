@@ -6,9 +6,10 @@
     "refresh_token_life": "7d"
   },
   "database": {
+    "database": "tplace",
     "host": "localhost",
     "port": "3360",
-    "user": "hwiesung",
+    "username": "hwiesung",
     "password": "wjdgnltjd"
   }
 }

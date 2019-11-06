@@ -8,7 +8,15 @@ var indexRouter = require('./routes');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var config = require('config');
+
 var app = express();
+
+var sequelize = require('./database').db.sequelize;
+sequelize.sync().then(()=>{
+  console.log('db connected');
+}).catch((err)=>{
+  console.log(err)
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
