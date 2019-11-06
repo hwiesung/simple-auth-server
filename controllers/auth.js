@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken')
-
+var config = require('config');
 
 exports.register = async (req, res) => {
-    const secret = req.app.get('jwt-secret')
+
 
     let user = {
         _id:'abc',
         username: 'hwiesung'
     };
-    console.log(secret);
+
     try{
         let token = await new Promise( (resolve, reject)=>{
             jwt.sign(
@@ -16,9 +16,9 @@ exports.register = async (req, res) => {
                     _id: user._id,
                     username: user.username
                 },
-                secret,
+                req.app.get('jwt-secret'),
                 {
-                    expiresIn: '1h',
+                    expiresIn: config.jwt.token_life,
                     issuer: 'sktelecom.com',
                     subject: 'userInfo'
                 }, (err, token) => {
@@ -32,9 +32,9 @@ exports.register = async (req, res) => {
                     _id: user._id,
                     username: user.username
                 },
-                secret,
+                req.app.get('jwt-refresh-secret'),
                 {
-                    expiresIn: '7d',
+                    expiresIn: config.jwt.refresh_token_life,
                     issuer: 'sktelecom.com',
                     subject: 'userInfo'
                 }, (err, token) => {
@@ -44,7 +44,8 @@ exports.register = async (req, res) => {
         });
         res.json({
             msg:'this router is working',
-            token
+            token,
+            refreshToken
         });
     } catch(err){
         res.status(403).json({

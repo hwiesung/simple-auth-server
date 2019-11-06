@@ -1,0 +1,14 @@
+{
+  "jwt": {
+    "secret_key": "AKIA4C4QR4IMFX5RWGLZ",
+    "refresh_secret_key": "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",
+    "token_life": "1d",
+    "refresh_token_life": "7d"
+  },
+  "database": {
+    "host": "localhost",
+    "port": "3360",
+    "user": "hwiesung",
+    "password": "wjdgnltjd"
+  }
+}

@@ -7,15 +7,15 @@ var logger = require('morgan');
 var indexRouter = require('./routes');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
-
+var config = require('config');
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.set('jwt-secret', 'SeCrEtKeYfOrHaShInG');
-
+app.set('jwt-secret', config.jwt.secret_key);
+app.set('jwt-refresh-secret', config.jwt.refresh_secret_key);
 
 app.use(logger('dev'));
 app.use(express.json());
