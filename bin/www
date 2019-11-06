@@ -7,7 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('auth-manager:server');
 var http = require('http');
-
+var fs = require('fs');
+const constants = require('../constants');
 /**
  * Get port from environment and store in Express.
  */
@@ -81,10 +82,14 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
+
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  fs.writeFileSync(constants.HEALTH_CHECK_PATH, '');
 }
+
+

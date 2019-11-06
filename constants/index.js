@@ -15,3 +15,5 @@ exports.RET_CODE = {
     INVALID_PARAMETER : 9000,
     FAIL_TO_DB_OPERATION : 9001,
 }
+
+exports.HEALTH_CHECK_PATH = __dirname +'/../public/healthCheck.html';
