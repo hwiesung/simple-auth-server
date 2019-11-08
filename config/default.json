@@ -8,8 +8,8 @@
   "database": {
     "database": "tplace",
     "host": "localhost",
-    "port": "3360",
-    "username": "hwiesung",
-    "password": "wjdgnltjd"
+    "port": "3306",
+    "username": "tplace",
+    "password": "awesome"
   }
 }
