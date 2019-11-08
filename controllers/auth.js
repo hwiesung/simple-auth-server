@@ -83,7 +83,9 @@ exports.register = async (req, res) => {
 
 exports.check = async (req, res) => {
     // read the token from header or url
-    const token = req.headers['x-access-token'] || req.query.token
+    console.log(req.headers);
+    const token = req.headers['x-access-token'];
+    const userId = req.headers['x-user-id'];
 
     // token does not exist
     if(!token) {
@@ -107,6 +109,11 @@ exports.check = async (req, res) => {
             }
         );
         console.log(decoded);
+        if(userId){
+            if(parseInt(userId) !== decoded.USER_ID){
+                throw 'not match userId';
+            }
+        }
 
         res.json({
             success: true,
@@ -114,7 +121,7 @@ exports.check = async (req, res) => {
         })
     } catch(err){
         res.status(403).json({
-            success: false,
+            RET_CODE:constants.RET_CODE.FAIL_TO_TOKEN_VERIFY,
             message: 'fail to verify token'
         })
     }
