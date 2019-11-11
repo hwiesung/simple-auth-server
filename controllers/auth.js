@@ -70,8 +70,8 @@ exports.register = async (req, res) => {
 
         res.json({
             RET_CODE: constants.RET_CODE.SUCCESS,
-            token,
-            refreshToken
+            ACCESS_TOKEN:token,
+            REFRESH_TOKEN:refreshToken
         });
     } catch(err){
         logger.error(JSON.stringify(err));
@@ -123,7 +123,7 @@ exports.check = async (req, res) => {
     } catch(err){
         res.status(403).json({
             RET_CODE:constants.RET_CODE.FAIL_TO_TOKEN_VERIFY,
-            message: 'fail to verify token'
+            MSG: 'fail to verify token'
         })
     }
 };
@@ -171,14 +171,14 @@ exports.refresh = async (req, res) => {
         });
 
         res.json({
-            success: true,
-            token
+            RET_CODE: 0,
+            ACCESS_TOKEN: token
         })
 
     }catch(err){
         res.status(403).json({
             RET_CODE:constants.RET_CODE.FAIL_TO_TOKEN_REFRESH,
-            message: 'fail to refresh token'
+            MSG: 'fail to refresh token'
         })
     }
 
