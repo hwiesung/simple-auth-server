@@ -128,6 +128,61 @@ exports.check = async (req, res) => {
 };
 
 exports.refresh = async (req, res) => {
+    const userId = req.body.USER_ID;
+    const serviceType = req.body.SERVICE_TYPE;
+    const refreshToken = req.body.REFRESH_TOKEN;
+    if(!userId || !serviceType || !refreshToken  ) {
+        return res.status(403).json({
+            RET_CODE: constants.RET_CODE.INVALID_PARAMETER,
+            MSG: 'invalid input parameter'
+        })
+    }
+
+    try{
+        let auth = await Auth.findOne(
+            {
+                where: {USER_ID: userId, SERVICE_TYPE:serviceType}
+            });
+
+        console.log(auth);
+        if(!auth || auth.REFRESH_TOKEN !== refreshToken){
+            return res.status(403).json({
+                RET_CODE: constants.RET_CODE.INVALID_REFRESH_TOKEN,
+                MSG: 'invalid refresh token'
+            });
+        }
+
+        let token = await new Promise( (resolve, reject)=>{
+            jwt.sign(
+                {
+                    SERVICE_TYPE: serviceType,
+                    USER_ID: userId
+                },
+                req.app.get('jwt-secret'),
+                {
+                    expiresIn: config.jwt.token_life,
+                    issuer: 'sktelecom.com',
+                    subject: 'userInfo'
+                }, (err, token) => {
+                    if (err) reject(err)
+                    resolve(token)
+                })
+        });
+
+        res.json({
+            success: true,
+            token
+        })
+
+    }catch(err){
+        res.status(403).json({
+            RET_CODE:constants.RET_CODE.FAIL_TO_TOKEN_REFRESH,
+            message: 'fail to refresh token'
+        })
+    }
+
+
+
 
 
 };
