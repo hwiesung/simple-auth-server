@@ -4,6 +4,8 @@ const constants = require('../constants');
 const db = require('../database').db;
 const Auth = require('../database').Auth;
 
+const logger = require('../common/logger');
+
 exports.register = async (req, res) => {
     const userId = req.body.USER_ID;
     const serviceType = req.body.SERVICE_TYPE;
@@ -72,7 +74,7 @@ exports.register = async (req, res) => {
             refreshToken
         });
     } catch(err){
-        console.log(err);
+        logger.error(JSON.stringify(err));
         res.status(403).json({
             RET_CODE:constants.RET_CODE.FAIL_TO_TOKEN_GENERATE,
             MSG: 'fail to generate token'
@@ -83,10 +85,10 @@ exports.register = async (req, res) => {
 
 exports.check = async (req, res) => {
     // read the token from header or url
-    console.log(req.headers);
     const token = req.headers['x-access-token'];
     const userId = req.headers['x-user-id'];
 
+    logger.info('check');
     // token does not exist
     if(!token) {
         return res.status(403).json({
@@ -101,14 +103,14 @@ exports.check = async (req, res) => {
         let decoded =  await new Promise((resolve, reject) => {
                 jwt.verify(token, secret, (err, decoded) => {
                     if(err) {
-                        console.log(err);
+                        logger.error(JSON.stringify(err));
                         reject(err);
                     }
                     resolve(decoded)
                 })
             }
         );
-        console.log(decoded);
+        logger.info({decoded});
         if(userId){
             if(parseInt(userId) !== decoded.USER_ID){
                 throw 'not match userId';
@@ -116,8 +118,7 @@ exports.check = async (req, res) => {
         }
 
         res.json({
-            success: true,
-            info: token
+            RET_CODE:constants.RET_CODE.SUCCESS
         })
     } catch(err){
         res.status(403).json({
@@ -144,7 +145,7 @@ exports.refresh = async (req, res) => {
                 where: {USER_ID: userId, SERVICE_TYPE:serviceType}
             });
 
-        console.log(auth);
+        logger.info({auth});
         if(!auth || auth.REFRESH_TOKEN !== refreshToken){
             return res.status(403).json({
                 RET_CODE: constants.RET_CODE.INVALID_REFRESH_TOKEN,
