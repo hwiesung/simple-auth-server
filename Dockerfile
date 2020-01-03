@@ -2,7 +2,7 @@
 FROM node:12.13.0
 
 #Dockerfile 을 생성/관리하는 사람
-MAINTAINER Jaeha Ahn <eu81273@gmail.com>
+MAINTAINER Hwiesung Jung <hwiesung@gmail.com>
 
 # /app 디렉토리 생성
 RUN mkdir -p /app
